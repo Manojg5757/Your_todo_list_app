@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wandering_coders</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>Your ToDo-List App</h1>
+    <div class="input-field">
+      <label for="name"
+        >Task Name
+        <input type="text" name="name" id="name" />
+      </label>
+      <br />
+      <label for="deadline"
+        >DeadLine
+        <input id="deadline" name="deadline" required type="datetime-local" />
+      </label>
+       <div class="buttons">
+        <button onclick="AddIt()">Add</button>
+        <button onclick="allClear()" >Clear all</button>
+       </div>
+     
+    </div>
+    <div id="todo-list"></div>
+    <script>
+      let todoArray =JSON.parse(localStorage.getItem('todos')) || []
+      const nameInput = document.getElementById("name");
+      const deadlineInput = document.getElementById("deadline");
+      const todo = document.getElementById("todo-list");
+
+      function AddIt() {
+        const name = nameInput.value.trim();
+        const deadline = deadlineInput.value.trim();
+        if (!name || !deadline) {
+          alert("Fill the input field");
+          return;
+        }
+
+        todoArray.push({ taskName: name, Time: deadline });
+        saveToLocalStorage();
+        displayTodoList();
+        clearInputFields();
+      }
+
+      function deleteItem(index) {
+        todoArray.splice(index, 1);
+        displayTodoList();
+      }
+
+      function displayTodoList() {
+        todo.innerHTML = ""
+        const eachItem = todoArray.map((item, index) => {
+            const formattedDate = formatDeadline(item.Time)
+            const list_div = document.createElement('div')
+            list_div.classList.add("list")
+
+            const taskPara = document.createElement('p')
+            taskPara.innerHTML = item.taskName
+            taskPara.style.wordWrap = 'break-word'
+
+            const taskDeadline = document.createElement('p')
+            taskDeadline.innerHTML =formattedDate
+            const addButton = document.createElement('button')
+            addButton.innerHTML = "X"
+
+            list_div.appendChild(taskPara)
+            list_div.appendChild(taskDeadline)
+            list_div.appendChild(addButton)
+
+            todo.appendChild(list_div)
+          return `<div class='list'>
+                    <p>${item.taskName}</p> 
+                    <p>${formattedDate}</p>
+                    <button onclick='deleteItem(${index})'>X</button>
+                   </div>`;
+         
+        });
+
+        todo.innerHTML = eachItem.join(" ");
+      }
+
+      function clearInputFields() {
+        nameInput.value = "";
+        deadlineInput.value = "";
+      }
+      function saveToLocalStorage() {
+        localStorage.setItem("todos", JSON.stringify(todoArray));
+      }
+      function formatDeadline(deadline){
+          const dateObject = new Date(deadline)
+          return dateObject.toLocaleString()
+      }
+      function allClear(){
+        todoArray = []
+        saveToLocalStorage();
+        displayTodoList()
+      }
+
+      document.getElementById("name").addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          AddIt();
+        }
+      });
+      displayTodoList();
+    </script>
+  </body>
+</html>
