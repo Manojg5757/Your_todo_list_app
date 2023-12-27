@@ -94,4 +94,9 @@ body{
     .list{
         height: 100%;
     }
+
+    .input-field label{
+        display: flex;
+        flex-direction: column;
+    }
 }
